@@ -1,0 +1,679 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Pibs: serverless computing</title><style>
+    /* cspell:disable-file */
+    /* webkit printing magic: print all background colors */
+    html {
+        -webkit-print-color-adjust: exact;
+    }
+    * {
+        box-sizing: border-box;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    html,
+    body {
+        margin: 0;
+        padding: 0;
+    }
+    @media only screen {
+        body {
+            margin: 2em auto;
+            max-width: 1500px;
+            color: rgb(55, 53, 47);
+        }
+    }
+    
+    body {
+        line-height: 1.5;
+        white-space: pre-wrap;
+    }
+    
+    a,
+    a.visited {
+        color: inherit;
+        text-decoration: underline;
+    }
+    
+    .pdf-relative-link-path {
+        font-size: 80%;
+        color: #444;
+    }
+    
+    h1,
+    h2,
+    h3 {
+        letter-spacing: -0.01em;
+        line-height: 1.2;
+        font-weight: 600;
+        margin-bottom: 0;
+    }
+    
+    .page-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-top: 0;
+        margin-bottom: 0.75em;
+    }
+    
+    h1 {
+        font-size: 1.875rem;
+        margin-top: 1.875rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+        margin-top: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.25rem;
+        margin-top: 1.25rem;
+    }
+    
+    .source {
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        padding: 1.5em;
+        word-break: break-all;
+    }
+    
+    .callout {
+        border-radius: 3px;
+        padding: 1rem;
+    }
+    
+    figure {
+        margin: 1.25em 0;
+        page-break-inside: avoid;
+    }
+    
+    figcaption {
+        opacity: 0.5;
+        font-size: 85%;
+        margin-top: 0.5em;
+    }
+    
+    mark {
+        background-color: transparent;
+    }
+    
+    .indented {
+        padding-left: 1.5em;
+    }
+    
+    hr {
+        background: transparent;
+        display: block;
+        width: 100%;
+        height: 1px;
+        visibility: visible;
+        border: none;
+        border-bottom: 1px solid rgba(55, 53, 47, 0.09);
+    }
+    
+    img {
+        max-width: 100%;
+    }
+    
+    @media only print {
+        img {
+            max-height: 100vh;
+            object-fit: contain;
+        }
+    }
+    
+    @page {
+        margin: 1in;
+    }
+    
+    .collection-content {
+        font-size: 0.875rem;
+    }
+    
+    .column-list {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .column {
+        padding: 0 1em;
+    }
+    
+    .column:first-child {
+        padding-left: 0;
+    }
+    
+    .column:last-child {
+        padding-right: 0;
+    }
+    
+    .table_of_contents-item {
+        display: block;
+        font-size: 0.875rem;
+        line-height: 1.3;
+        padding: 0.125rem;
+    }
+    
+    .table_of_contents-indent-1 {
+        margin-left: 1.5rem;
+    }
+    
+    .table_of_contents-indent-2 {
+        margin-left: 3rem;
+    }
+    
+    .table_of_contents-indent-3 {
+        margin-left: 4.5rem;
+    }
+    
+    .table_of_contents-link {
+        text-decoration: none;
+        opacity: 0.7;
+        border-bottom: 1px solid rgba(55, 53, 47, 0.18);
+    }
+    
+    table,
+    th,
+    td {
+        border: 1px solid rgba(55, 53, 47, 0.09);
+        border-collapse: collapse;
+    }
+    
+    table {
+        border-left: none;
+        border-right: none;
+    }
+    
+    th,
+    td {
+        font-weight: normal;
+        padding: 0.25em 0.5em;
+        line-height: 1.5;
+        min-height: 1.5em;
+        text-align: left;
+    }
+    
+    th {
+        color: rgba(55, 53, 47, 0.6);
+    }
+    
+    ol,
+    ul {
+        margin: 0;
+        margin-block-start: 0.6em;
+        margin-block-end: 0.6em;
+    }
+    
+    li > ol:first-child,
+    li > ul:first-child {
+        margin-block-start: 0.6em;
+    }
+    
+    ul > li {
+        list-style: disc;
+    }
+    
+    ul.to-do-list {
+        text-indent: -1.7em;
+    }
+    
+    ul.to-do-list > li {
+        list-style: none;
+    }
+    
+    .to-do-children-checked {
+        text-decoration: line-through;
+        opacity: 0.375;
+    }
+    
+    ul.toggle > li {
+        list-style: none;
+    }
+    
+    ul {
+        padding-inline-start: 1.7em;
+    }
+    
+    ul > li {
+        padding-left: 0.1em;
+    }
+    
+    ol {
+        padding-inline-start: 1.6em;
+    }
+    
+    ol > li {
+        padding-left: 0.2em;
+    }
+    
+    .mono ol {
+        padding-inline-start: 2em;
+    }
+    
+    .mono ol > li {
+        text-indent: -0.4em;
+    }
+    
+    .toggle {
+        padding-inline-start: 0em;
+        list-style-type: none;
+    }
+    
+    /* Indent toggle children */
+    .toggle > li > details {
+        padding-left: 1.7em;
+    }
+    
+    .toggle > li > details > summary {
+        margin-left: -1.1em;
+    }
+    
+    .selected-value {
+        display: inline-block;
+        padding: 0 0.5em;
+        background: rgba(206, 205, 202, 0.5);
+        border-radius: 3px;
+        margin-right: 0.5em;
+        margin-top: 0.3em;
+        margin-bottom: 0.3em;
+        white-space: nowrap;
+    }
+    
+    .collection-title {
+        display: inline-block;
+        margin-right: 1em;
+    }
+    
+    .simple-table {
+        margin-top: 1em;
+        font-size: 0.875rem;
+        empty-cells: show;
+    }
+    .simple-table td {
+        height: 29px;
+        min-width: 120px;
+    }
+    
+    .simple-table th {
+        height: 29px;
+        min-width: 120px;
+    }
+    
+    .simple-table-header-color {
+        background: rgb(247, 246, 243);
+        color: black;
+    }
+    .simple-table-header {
+        font-weight: 500;
+    }
+    
+    time {
+        opacity: 0.5;
+    }
+    
+    .icon {
+        display: inline-block;
+        max-width: 1.2em;
+        max-height: 1.2em;
+        text-decoration: none;
+        vertical-align: text-bottom;
+        margin-right: 0.5em;
+    }
+    
+    img.icon {
+        border-radius: 3px;
+    }
+    
+    .user-icon {
+        width: 1.5em;
+        height: 1.5em;
+        border-radius: 100%;
+        margin-right: 0.5rem;
+    }
+    
+    .user-icon-inner {
+        font-size: 0.8em;
+    }
+    
+    .text-icon {
+        border: 1px solid #000;
+        text-align: center;
+    }
+    
+    .page-cover-image {
+        display: block;
+        object-fit: cover;
+        width: 100%;
+        max-height: 30vh;
+    }
+    
+    .page-header-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+    }
+    
+    .page-header-icon-with-cover {
+        margin-top: -0.72em;
+        margin-left: 0.07em;
+    }
+    
+    .page-header-icon img {
+        border-radius: 3px;
+    }
+    
+    .link-to-page {
+        margin: 1em 0;
+        padding: 0;
+        border: none;
+        font-weight: 500;
+    }
+    
+    p > .user {
+        opacity: 0.5;
+    }
+    
+    td > .user,
+    td > time {
+        white-space: nowrap;
+    }
+    
+    input[type="checkbox"] {
+        transform: scale(1.5);
+        margin-right: 0.6em;
+        vertical-align: middle;
+    }
+    
+    p {
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
+    }
+    
+    .image {
+        border: none;
+        margin: 1.5em 0;
+        padding: 0;
+        border-radius: 0;
+        text-align: center;
+    }
+    
+    .code,
+    code {
+        background: rgba(135, 131, 120, 0.15);
+        border-radius: 3px;
+        padding: 0.2em 0.4em;
+        border-radius: 3px;
+        font-size: 85%;
+        tab-size: 2;
+    }
+    
+    code {
+        color: #eb5757;
+    }
+    
+    .code {
+        padding: 1.5em 1em;
+    }
+    
+    .code-wrap {
+        white-space: pre-wrap;
+        word-break: break-all;
+    }
+    
+    .code > code {
+        background: none;
+        padding: 0;
+        font-size: 100%;
+        color: inherit;
+    }
+    
+    blockquote {
+        font-size: 1.25em;
+        margin: 1em 0;
+        padding-left: 1em;
+        border-left: 3px solid rgb(55, 53, 47);
+    }
+    
+    .bookmark {
+        text-decoration: none;
+        max-height: 8em;
+        padding: 0;
+        display: flex;
+        width: 100%;
+        align-items: stretch;
+    }
+    
+    .bookmark-title {
+        font-size: 0.85em;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        height: 1.75em;
+        white-space: nowrap;
+    }
+    
+    .bookmark-text {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .bookmark-info {
+        flex: 4 1 180px;
+        padding: 12px 14px 14px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    .bookmark-image {
+        width: 33%;
+        flex: 1 1 180px;
+        display: block;
+        position: relative;
+        object-fit: cover;
+        border-radius: 1px;
+    }
+    
+    .bookmark-description {
+        color: rgba(55, 53, 47, 0.6);
+        font-size: 0.75em;
+        overflow: hidden;
+        max-height: 4.5em;
+        word-break: break-word;
+    }
+    
+    .bookmark-href {
+        font-size: 0.75em;
+        margin-top: 0.25em;
+    }
+    
+    .sans { font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol"; }
+    .code { font-family: "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace; }
+    .serif { font-family: Lyon-Text, Georgia, ui-serif, serif; }
+    .mono { font-family: iawriter-mono, Nitti, Menlo, Courier, monospace; }
+    .pdf .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK JP'; }
+    .pdf:lang(zh-CN) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK SC'; }
+    .pdf:lang(zh-TW) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK TC'; }
+    .pdf:lang(ko-KR) .sans { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif, "Segoe UI Emoji", "Segoe UI Symbol", 'Twemoji', 'Noto Color Emoji', 'Noto Sans CJK KR'; }
+    .pdf .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+    .pdf:lang(zh-CN) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+    .pdf:lang(zh-TW) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+    .pdf:lang(ko-KR) .code { font-family: Source Code Pro, "SFMono-Regular", Menlo, Consolas, "PT Mono", "Liberation Mono", Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+    .pdf .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK JP'; }
+    .pdf:lang(zh-CN) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK SC'; }
+    .pdf:lang(zh-TW) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK TC'; }
+    .pdf:lang(ko-KR) .serif { font-family: PT Serif, Lyon-Text, Georgia, ui-serif, serif, 'Twemoji', 'Noto Color Emoji', 'Noto Serif CJK KR'; }
+    .pdf .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK JP'; }
+    .pdf:lang(zh-CN) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK SC'; }
+    .pdf:lang(zh-TW) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK TC'; }
+    .pdf:lang(ko-KR) .mono { font-family: PT Mono, iawriter-mono, Nitti, Menlo, Courier, monospace, 'Twemoji', 'Noto Color Emoji', 'Noto Sans Mono CJK KR'; }
+    .highlight-default {
+        color: rgba(55, 53, 47, 1);
+    }
+    .highlight-gray {
+        color: rgba(120, 119, 116, 1);
+        fill: rgba(120, 119, 116, 1);
+    }
+    .highlight-brown {
+        color: rgba(159, 107, 83, 1);
+        fill: rgba(159, 107, 83, 1);
+    }
+    .highlight-orange {
+        color: rgba(217, 115, 13, 1);
+        fill: rgba(217, 115, 13, 1);
+    }
+    .highlight-yellow {
+        color: rgba(203, 145, 47, 1);
+        fill: rgba(203, 145, 47, 1);
+    }
+    .highlight-teal {
+        color: rgba(68, 131, 97, 1);
+        fill: rgba(68, 131, 97, 1);
+    }
+    .highlight-blue {
+        color: rgba(51, 126, 169, 1);
+        fill: rgba(51, 126, 169, 1);
+    }
+    .highlight-purple {
+        color: rgba(144, 101, 176, 1);
+        fill: rgba(144, 101, 176, 1);
+    }
+    .highlight-pink {
+        color: rgba(193, 76, 138, 1);
+        fill: rgba(193, 76, 138, 1);
+    }
+    .highlight-red {
+        color: rgba(212, 76, 71, 1);
+        fill: rgba(212, 76, 71, 1);
+    }
+    .highlight-gray_background {
+        background: rgba(241, 241, 239, 1);
+    }
+    .highlight-brown_background {
+        background: rgba(244, 238, 238, 1);
+    }
+    .highlight-orange_background {
+        background: rgba(251, 236, 221, 1);
+    }
+    .highlight-yellow_background {
+        background: rgba(251, 243, 219, 1);
+    }
+    .highlight-teal_background {
+        background: rgba(237, 243, 236, 1);
+    }
+    .highlight-blue_background {
+        background: rgba(231, 243, 248, 1);
+    }
+    .highlight-purple_background {
+        background: rgba(244, 240, 247, 0.8);
+    }
+    .highlight-pink_background {
+        background: rgba(249, 238, 243, 0.8);
+    }
+    .highlight-red_background {
+        background: rgba(253, 235, 236, 1);
+    }
+    .block-color-default {
+        color: inherit;
+        fill: inherit;
+    }
+    .block-color-gray {
+        color: rgba(120, 119, 116, 1);
+        fill: rgba(120, 119, 116, 1);
+    }
+    .block-color-brown {
+        color: rgba(159, 107, 83, 1);
+        fill: rgba(159, 107, 83, 1);
+    }
+    .block-color-orange {
+        color: rgba(217, 115, 13, 1);
+        fill: rgba(217, 115, 13, 1);
+    }
+    .block-color-yellow {
+        color: rgba(203, 145, 47, 1);
+        fill: rgba(203, 145, 47, 1);
+    }
+    .block-color-teal {
+        color: rgba(68, 131, 97, 1);
+        fill: rgba(68, 131, 97, 1);
+    }
+    .block-color-blue {
+        color: rgba(51, 126, 169, 1);
+        fill: rgba(51, 126, 169, 1);
+    }
+    .block-color-purple {
+        color: rgba(144, 101, 176, 1);
+        fill: rgba(144, 101, 176, 1);
+    }
+    .block-color-pink {
+        color: rgba(193, 76, 138, 1);
+        fill: rgba(193, 76, 138, 1);
+    }
+    .block-color-red {
+        color: rgba(212, 76, 71, 1);
+        fill: rgba(212, 76, 71, 1);
+    }
+    .block-color-gray_background {
+        background: rgba(241, 241, 239, 1);
+    }
+    .block-color-brown_background {
+        background: rgba(244, 238, 238, 1);
+    }
+    .block-color-orange_background {
+        background: rgba(251, 236, 221, 1);
+    }
+    .block-color-yellow_background {
+        background: rgba(251, 243, 219, 1);
+    }
+    .block-color-teal_background {
+        background: rgba(237, 243, 236, 1);
+    }
+    .block-color-blue_background {
+        background: rgba(231, 243, 248, 1);
+    }
+    .block-color-purple_background {
+        background: rgba(244, 240, 247, 0.8);
+    }
+    .block-color-pink_background {
+        background: rgba(249, 238, 243, 0.8);
+    }
+    .block-color-red_background {
+        background: rgba(253, 235, 236, 1);
+    }
+    .select-value-color-pink { background-color: rgba(245, 224, 233, 1); }
+    .select-value-color-purple { background-color: rgba(232, 222, 238, 1); }
+    .select-value-color-green { background-color: rgba(219, 237, 219, 1); }
+    .select-value-color-gray { background-color: rgba(227, 226, 224, 1); }
+    .select-value-color-opaquegray { background-color: rgba(255, 255, 255, 0.0375); }
+    .select-value-color-orange { background-color: rgba(250, 222, 201, 1); }
+    .select-value-color-brown { background-color: rgba(238, 224, 218, 1); }
+    .select-value-color-red { background-color: rgba(255, 226, 221, 1); }
+    .select-value-color-yellow { background-color: rgba(253, 236, 200, 1); }
+    .select-value-color-blue { background-color: rgba(211, 229, 239, 1); }
+    
+    .checkbox {
+        display: inline-flex;
+        vertical-align: text-bottom;
+        width: 16;
+        height: 16;
+        background-size: 16px;
+        margin-left: 2px;
+        margin-right: 5px;
+    }
+    
+    .checkbox-on {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%2358A9D7%22%2F%3E%0A%3Cpath%20d%3D%22M6.71429%2012.2852L14%204.9995L12.7143%203.71436L6.71429%209.71378L3.28571%206.2831L2%207.57092L6.71429%2012.2852Z%22%20fill%3D%22white%22%2F%3E%0A%3C%2Fsvg%3E");
+    }
+    
+    .checkbox-off {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.75%22%20y%3D%220.75%22%20width%3D%2214.5%22%20height%3D%2214.5%22%20fill%3D%22white%22%20stroke%3D%22%2336352F%22%20stroke-width%3D%221.5%22%2F%3E%0A%3C%2Fsvg%3E");
+    }
+        
+    </style></head><body><article id="9c320f0c-fed6-467d-a5ea-dd76933059a2" class="page sans"><header><img class="page-cover-image" src="https://images.unsplash.com/photo-1517433456452-f9633a875f6f?ixlib=rb-1.2.1&amp;q=85&amp;fm=jpg&amp;crop=entropy&amp;cs=srgb" style="object-position:center 50%"/><div class="page-header-icon page-header-icon-with-cover"><span class="icon">🖥️</span></div><h1 class="page-title">Pibs: serverless computing</h1></header><div class="page-body"><nav id="21df8cb5-cfb7-4771-b739-01eafc6c0c4c" class="block-color-gray table_of_contents"><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#f2a254b2-5397-4eab-8a42-8131155aadaf">Module structure</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#20b6ebaa-0738-49ea-aa90-81e10f65ef46">Part one:  REST API intro</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#49d56730-568e-4458-b617-030b01b5780f">Slides links</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#354fcd3c-fa1e-4065-b434-683a534a6fe1">Video Tutorials</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#da36f2f9-366d-4124-b56d-91e649aea9b0">Exercises</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#854482e0-b270-48fe-8f18-04dce3498a14">Part two: AWS Lambda</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#dbabefaf-b9df-4a18-8519-00c03648a740">Slides links</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#8de9cd41-fc94-4d21-9dd3-12985236055f">Video Tutorials</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#ea0242a5-c6a4-4de3-941d-a77db9f437ad">Before slides</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#1f18c09c-2ea2-4e30-accd-754efbd93fc3">After slides</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#eee37d0d-05e1-4ddb-88e6-e4bf00d2b4b1">Exercises</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#31654ab5-ccf0-4b0b-a6b3-d858bd0c9b33">Part three: API Gateway / Serverless DBs / Serverless on prem</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#b3f63200-32e7-4009-bb64-918570080b31">Slides links</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#72cfb88e-7fbe-45a5-944d-c167ec748902">Video Tutorials</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#8f7265b9-2d92-446e-aacd-c569b246860c">Introduction</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#2f1835f0-b20f-42a0-acc2-dd132330bfda">Hands-on: API Gateway and Lambda integration</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#4d53165b-6f4c-4210-9641-ab0adda02409">General overview on AWS API Gateway and its features</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#e3c33af0-4e82-431c-9c4d-2cdabce577cd">API Testing: Postman</a></div><div class="table_of_contents-item table_of_contents-indent-2"><a class="table_of_contents-link" href="#2b90c64f-7bdb-433c-ad56-ea7cceb7a00c">Data &amp; Databases</a></div><div class="table_of_contents-item table_of_contents-indent-1"><a class="table_of_contents-link" href="#aa0822ad-5dce-4ed2-b9eb-754ff2607625">Exercises</a></div><div class="table_of_contents-item table_of_contents-indent-0"><a class="table_of_contents-link" href="#9d44a416-f7d2-4e81-859e-db744089b743">Wrap up: final exercise</a></div></nav><h1 id="f2a254b2-5397-4eab-8a42-8131155aadaf" class="">Module structure</h1><p id="4e392fe6-355f-436f-b78a-4a89eae7ccff" class="">The module lasts 5 weeks and it will divided like following:</p><p id="c2269d7d-a360-4f29-99ac-964c2b314ee4" class="">(W = Week)</p><ul id="fea3c3a3-22ad-4119-8f4d-f9003a1f59ee" class="bulleted-list"><li style="list-style-type:disc">W1:  REST API intro (slides + some videos) + Flask app (see exercises) ⇒ PART ONE</li></ul><ul id="0aaf481b-009b-4961-b99d-f441fa01f296" class="bulleted-list"><li style="list-style-type:disc">W2 / W3: Lambda - (slides + videos + exercises) ⇒ PART TWO</li></ul><ul id="bb90d310-b738-42fd-be24-63504236bcf1" class="bulleted-list"><li style="list-style-type:disc">W4 / W5: API GW - Serverless DBs (slides + videos + exercises) ⇒ PART THREE</li></ul><ul id="e4fba7aa-38a2-4dba-90a8-dbc3440204b3" class="bulleted-list"><li style="list-style-type:disc">Wrap up exercise &amp; presentation</li></ul><h1 id="20b6ebaa-0738-49ea-aa90-81e10f65ef46" class="">Part one:  REST API intro</h1><h2 id="49d56730-568e-4458-b617-030b01b5780f" class="">Slides links</h2><figure id="c4f88073-ab6d-4507-8be4-7c2b4ab388be"><div class="source"><a href="https://amanox.sharepoint.com/:p:/s/Amanox/ERJGOqWERIRMi1guUfnA2HwBwFJMOTtSC-OTNE3mH3E2Jw?e=KHSWuK">https://amanox.sharepoint.com/:p:/s/Amanox/ERJGOqWERIRMi1guUfnA2HwBwFJMOTtSC-OTNE3mH3E2Jw?e=KHSWuK</a></div></figure><h2 id="354fcd3c-fa1e-4065-b434-683a534a6fe1" class="">Video Tutorials</h2><figure id="d4a04502-ada5-46cb-989a-b32164fbbab6"><div class="source"><a href="https://youtu.be/lsMQRaeKNDk">https://youtu.be/lsMQRaeKNDk</a></div></figure><figure id="0e495163-5929-45dc-b9fd-69d526373915"><div class="source"><a href="https://youtu.be/0juyVjBN8HQ">https://youtu.be/0juyVjBN8HQ</a></div></figure><h2 id="da36f2f9-366d-4124-b56d-91e649aea9b0" class="">Exercises</h2><p id="2fdcc860-e4c4-4ed6-b303-2c00d1a7f652" class="">Execute the exercise described in slides (Introduction to serverless).</p><p id="8eee4624-f691-4ad2-932f-6e7d3954fa3d" class="">That will result in the “Flask app” that we’ll refer other exercises.</p><h1 id="854482e0-b270-48fe-8f18-04dce3498a14" class="">Part two: AWS Lambda</h1><h2 id="dbabefaf-b9df-4a18-8519-00c03648a740" class="">Slides links</h2><p id="4c76fef9-4cba-44bb-84b6-1cd0f3cf2fd0" class="">Valid for part 2 &amp; 3. Requires Amanox account to open.</p><figure id="15905091-46de-4123-b91d-6e957070e9a7"><div class="source"><a href="https://amanox.sharepoint.com/:p:/s/Amanox/ERJu5sVhf_dNoXTFB52Q3mEBEZX4LegbrxXYeYtByiJ63w?e=fReWVy">https://amanox.sharepoint.com/:p:/s/Amanox/ERJu5sVhf_dNoXTFB52Q3mEBEZX4LegbrxXYeYtByiJ63w?e=fReWVy</a></div></figure><h2 id="8de9cd41-fc94-4d21-9dd3-12985236055f" class="">Video Tutorials</h2><h3 id="ea0242a5-c6a4-4de3-941d-a77db9f437ad" class="">Before slides</h3><figure id="64db9f81-7113-4a22-ad3e-ab3158ff1862"><div class="source"><a href="https://youtu.be/vxJobGtqKVM">https://youtu.be/vxJobGtqKVM</a></div></figure><h3 id="1f18c09c-2ea2-4e30-accd-754efbd93fc3" class="">After slides</h3><figure id="34489a99-3d03-4244-8021-fe752979f077"><div class="source"><a href="https://youtu.be/CdBtNQZH8a4">https://youtu.be/CdBtNQZH8a4</a></div></figure><figure id="e05acfa5-89e6-40c1-b06a-21fc82effc88"><div class="source"><a href="https://youtu.be/IiJIHG4Qw9M">https://youtu.be/IiJIHG4Qw9M</a></div></figure><figure id="635519f5-5646-4686-911d-d0bcc66414d8"><div class="source"><a href="https://youtu.be/QAbqJzd0PEE">https://youtu.be/QAbqJzd0PEE</a></div></figure><h2 id="eee37d0d-05e1-4ddb-88e6-e4bf00d2b4b1" class="">Exercises</h2><ul id="c340eac8-b272-4845-8c4c-d86f596b2f1f" class="bulleted-list"><li style="list-style-type:disc">Port Flask app REST endpoint handlers in Lambda (separate lambda for every handler).</li></ul><ul id="63d38544-8d07-4e97-b951-cb91759a037a" class="bulleted-list"><li style="list-style-type:disc">Using Lambda dashboard, define test cases to invoke each Lambda.</li></ul><h1 id="31654ab5-ccf0-4b0b-a6b3-d858bd0c9b33" class="">Part three: API Gateway / Serverless DBs / Serverless on prem</h1><h2 id="b3f63200-32e7-4009-bb64-918570080b31" class="">Slides links</h2><p id="2b75c361-a38a-4fce-955b-37d7f274477c" class="">Valid for part 2 &amp; 3. Requires Amanox account to open.</p><figure id="5907514f-35a0-4584-bf73-019ec8523760"><div class="source"><a href="https://amanox.sharepoint.com/:p:/s/Amanox/ERJu5sVhf_dNoXTFB52Q3mEBEZX4LegbrxXYeYtByiJ63w?e=fReWVy">https://amanox.sharepoint.com/:p:/s/Amanox/ERJu5sVhf_dNoXTFB52Q3mEBEZX4LegbrxXYeYtByiJ63w?e=fReWVy</a></div></figure><figure id="34a8dd2e-4fa3-4731-a41f-decc5b1f6d97"><div class="source"><a href="https://amanox.sharepoint.com/:p:/s/Amanox/Ebqcrc0sBndHvbzjRJIp13IBeojNXYNiqdgXevHnf2rHNg?e=MSAKup">https://amanox.sharepoint.com/:p:/s/Amanox/Ebqcrc0sBndHvbzjRJIp13IBeojNXYNiqdgXevHnf2rHNg?e=MSAKup</a></div></figure><h2 id="72cfb88e-7fbe-45a5-944d-c167ec748902" class="">Video Tutorials</h2><h3 id="8f7265b9-2d92-446e-aacd-c569b246860c" class="">Introduction</h3><figure id="e70d6333-7e9a-41d4-9a22-1f8666b02449"><div class="source"><a href="https://youtu.be/hWRRdICvMNs">https://youtu.be/hWRRdICvMNs</a></div></figure><h3 id="2f1835f0-b20f-42a0-acc2-dd132330bfda" class="">Hands-on: API Gateway and Lambda integration</h3><figure id="f486d0dd-2258-45cb-9ae8-7e0089e7f365"><div class="source"><a href="https://www.youtube.com/watch?v=M91vXdjve7A">https://www.youtube.com/watch?v=M91vXdjve7A</a></div></figure><figure id="880639d9-4eb7-400c-8f8e-fa50b16095cb"><div class="source"><a href="https://youtu.be/R6XnksqabKY">https://youtu.be/R6XnksqabKY</a></div></figure><h3 id="4d53165b-6f4c-4210-9641-ab0adda02409" class="">General overview on AWS API Gateway and its features</h3><figure id="01becf97-6a33-4e7e-92a6-d5d7697aa24f"><div class="source"><a href="https://youtu.be/XwfpPEFHKtQ">https://youtu.be/XwfpPEFHKtQ</a></div></figure><figure id="3d051a53-26b6-4900-9fd2-e130e97b100d"><div class="source"><a href="https://youtu.be/yfJZc3sJZ8E">https://youtu.be/yfJZc3sJZ8E</a></div></figure><h3 id="e3c33af0-4e82-431c-9c4d-2cdabce577cd" class="">API Testing: Postman</h3><figure id="e0e9b890-13b8-4fc0-8d3a-1b5c31572e67"><div class="source"><a href="https://youtu.be/VywxIQ2ZXw4">https://youtu.be/VywxIQ2ZXw4</a></div></figure><h3 id="2b90c64f-7bdb-433c-ad56-ea7cceb7a00c" class="">Data &amp; Databases</h3><p id="4d270895-0ad5-4625-9249-5829b0615fbb" class=""><strong>Introduction</strong></p><figure id="8a1f82d4-8c52-47f9-8530-7f41485574cb"><div class="source"><a href="https://www.youtube.com/watch?v=ruz-vK8IesE">https://www.youtube.com/watch?v=ruz-vK8IesE</a></div></figure><figure id="0fb763d5-12af-4d6a-8bff-9606416397ea"><div class="source"><a href="https://youtu.be/crHwekf0gTA">https://youtu.be/crHwekf0gTA</a></div></figure><p id="364feabc-b40b-4e34-99e7-9a50f498abc5" class=""><strong>Hands-on</strong></p><figure id="ee567678-aa4b-4bc7-910d-88ec91793ebc"><div class="source"><a href="https://youtu.be/W-tzoGYMfTA">https://youtu.be/W-tzoGYMfTA</a></div></figure><figure id="214f14be-910d-4ca3-bad2-3160b38a87e2"><div class="source"><a href="https://youtu.be/2k2GINpO308">https://youtu.be/2k2GINpO308</a></div></figure><figure id="e2adeae6-ce01-4ebe-9af8-28cd6772d8f2"><div class="source"><a href="https://youtu.be/Nk_vjiv6_bE">https://youtu.be/Nk_vjiv6_bE</a></div></figure><p id="fcd4f4ad-b781-47c0-a0c7-e5458de49de5" class=""><strong>ERA</strong></p><p id="f2dd5a09-0982-4928-8889-c85b48029b07" class="">A short excursion to the serverless world of Nutanix Era</p><figure id="034ec6ba-4c83-459f-ae60-5b6d933a41ee"><div class="source"><a href="https://www.youtube.com/watch?v=2yGrOXLXU-s">https://www.youtube.com/watch?v=2yGrOXLXU-s</a></div></figure><p id="1b6f13b9-7f0a-4ccf-89b1-5c46eb55ee55" class="">
+    </p><p id="03baa566-5186-4110-9dad-fdfeb28a7ae4" class=""><strong>The Era universe from a manufacturer perspective</strong></p><p id="7425da83-eaa1-446c-bdff-9bd3b21e62b4" class="">It is a lot of sales stuff focus on the technical parts of the pdf.</p><figure id="012be5c6-7852-4dc5-977b-6d01ff8cd9b0"><div class="source"><a href="https://amanox.sharepoint.com/:b:/s/Amanox/EcrAqtsEsmFEotbyYfN6sSYBHvw7R6gz3y9AojPJc43XLg?e=HoMAyC">https://amanox.sharepoint.com/:b:/s/Amanox/EcrAqtsEsmFEotbyYfN6sSYBHvw7R6gz3y9AojPJc43XLg?e=HoMAyC</a></div></figure><p id="efa7c141-2094-4479-b466-e7fb1fbf6299" class=""><strong>Conclusion (technical view):</strong></p><figure id="fde3c967-723c-4cd6-a29d-df7c4867897a"><div class="source"><a href="https://amanox.sharepoint.com/:p:/s/Amanox/ERS_WLsqXH1NgaT-SzI1ThoB2QPl7x_rVoslIbBbeR929A?e=TGeYnw">https://amanox.sharepoint.com/:p:/s/Amanox/ERS_WLsqXH1NgaT-SzI1ThoB2QPl7x_rVoslIbBbeR929A?e=TGeYnw</a></div></figure><h2 id="aa0822ad-5dce-4ed2-b9eb-754ff2607625" class="">Exercises</h2><p id="bb5cc86d-dcb8-4c34-9fbc-727b6afdca54" class="">
+    </p><ul id="717f70a3-f985-458e-b44d-7bab52d33fdb" class="bulleted-list"><li style="list-style-type:disc">Port flask app to work with AWS API Gateway + Lambda handlers</li></ul><ul id="c915efcf-d9be-444f-b2cc-67c1f52b0f0b" class="bulleted-list"><li style="list-style-type:disc">Using an API testing tools (like <a href="https://www.postman.com/">Postman</a>) prepare and execute a set of API test calls, resembling the test cases that you’ve defined in Lambda exercise.</li></ul><ul id="d4f5951a-5071-4688-9936-8ae6b021f0e4" class="bulleted-list"><li style="list-style-type:disc">Launch and execute the ERA test drive:
+    </li></ul><figure id="6a1d871b-d8dd-444b-95f6-55b59d05ff5a"><a href="https://www.nutanix.com/next-tdlive?type=era" class="bookmark source"><div class="bookmark-info"><div class="bookmark-text"><div class="bookmark-title">Test Drive Nutanix Hybrid Multicloud Platform</div><div class="bookmark-description">Try and experience the same Hybrid Multicloud Infrastructure that powers the world&#x27;s leading businesses-no hardware, no setup, and no cost.</div></div><div class="bookmark-href"><img src="https://www.nutanix.com/content/dam/nutanix/global/favicons/favicon.ico" class="icon bookmark-icon"/>https://www.nutanix.com/next-tdlive?type=era</div></div><img src="https://www.nutanix.com/content/dam/nutanix/images/test-drive-og-image.png" class="bookmark-image"/></a></figure><ul id="dc90d533-345e-4b55-9e02-b388f680197f" class="bulleted-list"><li style="list-style-type:disc">If you have some more time and motivation to extend your know how in Nutanix Era please ask Coach Dom for more stuff.</li></ul><h1 id="9d44a416-f7d2-4e81-859e-db744089b743" class="">Wrap up: final exercise</h1><ul id="2cfd0029-7e8f-4cba-9d74-95c950535bfd" class="bulleted-list"><li style="list-style-type:disc">Prepare a presentation with live demo of all the previous exercises.</li></ul><p id="a013373e-b728-4477-8248-ccc71a426559" class="">
+    </p><p id="40b32b33-63ee-4748-a4f7-ed789561c1d1" class="">
+    </p><p id="0758256b-ff27-4c6d-aace-c149fd1c46b7" class="">
+    </p><p id="f1529a1a-041d-4916-ac39-1b271e4af9c1" class="">
+    </p><p id="6af0f083-4548-41e0-8a52-065f7bcb520b" class="">
+    </p><p id="e1ee4aa1-b144-42f9-95d0-416438dbaa34" class="">
+    </p><p id="dd1a83d2-b03c-49fc-9dfa-4349caecf2f7" class="">
+    </p></div></article></body></html>
